@@ -1,0 +1,59 @@
+{
+  "timestamp": "2026-04-17T17:30:00Z",
+  "zones": [
+    { "id": "g1", "name": "Gate 1", "type": "exit", "x": 500, "y": 80, "current_density": 0.4, "incoming_flow": 120, "outgoing_flow": 100, "capacity": 1000 },
+    { "id": "g4", "name": "Gate 4", "type": "exit", "x": 797, "y": 203, "current_density": 0.7, "incoming_flow": 300, "outgoing_flow": 250, "capacity": 1200 },
+    { "id": "g6", "name": "Gate 6", "type": "exit", "x": 920, "y": 500, "current_density": 0.85, "incoming_flow": 500, "outgoing_flow": 100, "capacity": 1000 },
+    { "id": "g9", "name": "Gate 9", "type": "exit", "x": 797, "y": 797, "current_density": 0.3, "incoming_flow": 50, "outgoing_flow": 80, "capacity": 1000 },
+    { "id": "g11", "name": "Gate 11", "type": "exit", "x": 500, "y": 920, "current_density": 0.2, "incoming_flow": 10, "outgoing_flow": 10, "capacity": 1000 },
+    { "id": "g14", "name": "Gate 14", "type": "exit", "x": 203, "y": 797, "current_density": 0.5, "incoming_flow": 200, "outgoing_flow": 150, "capacity": 1500 },
+    { "id": "g16", "name": "Gate 16", "type": "exit", "x": 80, "y": 500, "current_density": 0.4, "incoming_flow": 100, "outgoing_flow": 50, "capacity": 1000 },
+    { "id": "g17", "name": "Gate 17", "type": "exit", "x": 203, "y": 203, "current_density": 0.6, "incoming_flow": 150, "outgoing_flow": 40, "capacity": 1000 },
+    
+    { "id": "s_fedex_kmk", "name": "FedEx KMK Stand", "type": "stand", "x": 500, "y": 220, "current_density": 0.9, "incoming_flow": 200, "outgoing_flow": 50, "capacity": 4000 },
+    { "id": "s_c", "name": "Astral Pipes C Stand", "type": "stand", "x": 698, "y": 302, "current_density": 0.6, "incoming_flow": 150, "outgoing_flow": 100, "capacity": 3500 },
+    { "id": "s_d", "name": "Equitas Bank D Stand", "type": "stand", "x": 780, "y": 500, "current_density": 0.7, "incoming_flow": 300, "outgoing_flow": 250, "capacity": 4000 },
+    { "id": "s_e", "name": "British Empire E", "type": "stand", "x": 698, "y": 698, "current_density": 0.5, "incoming_flow": 100, "outgoing_flow": 50, "capacity": 3000 },
+    { "id": "s_f", "name": "Etihad Airways F/G/J", "type": "stand", "x": 500, "y": 780, "current_density": 0.85, "incoming_flow": 400, "outgoing_flow": 100, "capacity": 5500 },
+    { "id": "s_h", "name": "Ashok Leyland H", "type": "stand", "x": 302, "y": 698, "current_density": 0.4, "incoming_flow": 100, "outgoing_flow": 120, "capacity": 3000 },
+    { "id": "s_i", "name": "FedEx I Stand", "type": "stand", "x": 220, "y": 500, "current_density": 0.2, "incoming_flow": 50, "outgoing_flow": 80, "capacity": 3000 },
+    { "id": "s_k", "name": "Bonbloc K Stand", "type": "stand", "x": 302, "y": 302, "current_density": 0.3, "incoming_flow": 40, "outgoing_flow": 20, "capacity": 2500 },
+    { "id": "s_mcc", "name": "MCC Lounge", "type": "stand", "x": 360, "y": 220, "current_density": 0.6, "incoming_flow": 10, "outgoing_flow": 10, "capacity": 1000 },
+
+    { "id": "food_1", "name": "North Food Court", "type": "food", "x": 420, "y": 140, "current_density": 0.6, "incoming_flow": 100, "outgoing_flow": 120, "capacity": 800 },
+    { "id": "food_2", "name": "South Food Court", "type": "food", "x": 580, "y": 860, "current_density": 0.9, "incoming_flow": 300, "outgoing_flow": 200, "capacity": 800 },
+    { "id": "food_3", "name": "East Pavilion Cafe", "type": "food", "x": 860, "y": 600, "current_density": 0.4, "incoming_flow": 50, "outgoing_flow": 80, "capacity": 500 }
+  ],
+  "stalls": [
+    { "id": "f_1", "name": "Chennai Snacks (North)", "zone": "food_1", "wait_time_mins": 5, "category": "food" },
+    { "id": "f_2", "name": "Biryani Express (South)", "zone": "food_2", "wait_time_mins": 25, "category": "food" },
+    { "id": "f_3", "name": "Chepauk Fast Food", "zone": "food_3", "wait_time_mins": 10, "category": "food" },
+    { "id": "f_4", "name": "Filter Coffee Stand", "zone": "s_fedex_kmk", "wait_time_mins": 15, "category": "food" }
+  ],
+  "routes": [
+    { "id": "r1", "start": "s_fedex_kmk", "end": "g1", "distance_m": 50, "zones_crossed": ["s_fedex_kmk", "g1"] },
+    { "id": "r2", "start": "s_fedex_kmk", "end": "food_1", "distance_m": 40, "zones_crossed": ["s_fedex_kmk", "food_1"] },
+    { "id": "r3", "start": "s_c", "end": "g4", "distance_m": 80, "zones_crossed": ["s_c", "g4"] },
+    { "id": "r4", "start": "s_d", "end": "g6", "distance_m": 50, "zones_crossed": ["s_d", "g6"] },
+    { "id": "r5", "start": "s_e", "end": "g9", "distance_m": 60, "zones_crossed": ["s_e", "g9"] },
+    { "id": "r6", "start": "s_f", "end": "g11", "distance_m": 50, "zones_crossed": ["s_f", "g11"] },
+    { "id": "r7", "start": "s_h", "end": "g14", "distance_m": 60, "zones_crossed": ["s_h", "g14"] },
+    { "id": "r8", "start": "s_i", "end": "g16", "distance_m": 50, "zones_crossed": ["s_i", "g16"] },
+    { "id": "r9", "start": "s_k", "end": "g17", "distance_m": 60, "zones_crossed": ["s_k", "g17"] },
+
+    { "id": "r10", "start": "s_f", "end": "food_2", "distance_m": 40, "zones_crossed": ["s_f", "food_2"] },
+    { "id": "r11", "start": "s_e", "end": "food_3", "distance_m": 70, "zones_crossed": ["s_e", "food_3"] },
+    { "id": "r12", "start": "s_d", "end": "food_3", "distance_m": 60, "zones_crossed": ["s_d", "food_3"] },
+    { "id": "r13", "start": "s_mcc", "end": "food_1", "distance_m": 80, "zones_crossed": ["s_mcc", "food_1"] },
+
+    { "id": "r14", "start": "s_fedex_kmk", "end": "s_c", "distance_m": 120, "zones_crossed": ["s_fedex_kmk", "s_c"] },
+    { "id": "r15", "start": "s_c", "end": "s_d", "distance_m": 100, "zones_crossed": ["s_c", "s_d"] },
+    { "id": "r16", "start": "s_d", "end": "s_e", "distance_m": 100, "zones_crossed": ["s_d", "s_e"] },
+    { "id": "r17", "start": "s_e", "end": "s_f", "distance_m": 120, "zones_crossed": ["s_e", "s_f"] },
+    { "id": "r18", "start": "s_f", "end": "s_h", "distance_m": 100, "zones_crossed": ["s_f", "s_h"] },
+    { "id": "r19", "start": "s_h", "end": "s_i", "distance_m": 100, "zones_crossed": ["s_h", "s_i"] },
+    { "id": "r20", "start": "s_i", "end": "s_k", "distance_m": 120, "zones_crossed": ["s_i", "s_k"] },
+    { "id": "r21", "start": "s_k", "end": "s_mcc", "distance_m": 80, "zones_crossed": ["s_k", "s_mcc"] },
+    { "id": "r22", "start": "s_mcc", "end": "s_fedex_kmk", "distance_m": 100, "zones_crossed": ["s_mcc", "s_fedex_kmk"] }
+  ]
+}
