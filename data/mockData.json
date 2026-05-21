@@ -10,24 +10,24 @@
     { "id": "g16", "name": "Gate 16", "type": "exit", "x": 80, "y": 500, "current_density": 0.4, "incoming_flow": 100, "outgoing_flow": 50, "capacity": 1000 },
     { "id": "g17", "name": "Gate 17", "type": "exit", "x": 203, "y": 203, "current_density": 0.6, "incoming_flow": 150, "outgoing_flow": 40, "capacity": 1000 },
     
-    { "id": "s_fedex_kmk", "name": "FedEx KMK Stand", "type": "stand", "x": 500, "y": 220, "current_density": 0.9, "incoming_flow": 200, "outgoing_flow": 50, "capacity": 4000 },
-    { "id": "s_c", "name": "Astral Pipes C Stand", "type": "stand", "x": 698, "y": 302, "current_density": 0.6, "incoming_flow": 150, "outgoing_flow": 100, "capacity": 3500 },
-    { "id": "s_d", "name": "Equitas Bank D Stand", "type": "stand", "x": 780, "y": 500, "current_density": 0.7, "incoming_flow": 300, "outgoing_flow": 250, "capacity": 4000 },
-    { "id": "s_e", "name": "British Empire E", "type": "stand", "x": 698, "y": 698, "current_density": 0.5, "incoming_flow": 100, "outgoing_flow": 50, "capacity": 3000 },
-    { "id": "s_f", "name": "Etihad Airways F/G/J", "type": "stand", "x": 500, "y": 780, "current_density": 0.85, "incoming_flow": 400, "outgoing_flow": 100, "capacity": 5500 },
-    { "id": "s_h", "name": "Ashok Leyland H", "type": "stand", "x": 302, "y": 698, "current_density": 0.4, "incoming_flow": 100, "outgoing_flow": 120, "capacity": 3000 },
-    { "id": "s_i", "name": "FedEx I Stand", "type": "stand", "x": 220, "y": 500, "current_density": 0.2, "incoming_flow": 50, "outgoing_flow": 80, "capacity": 3000 },
-    { "id": "s_k", "name": "Bonbloc K Stand", "type": "stand", "x": 302, "y": 302, "current_density": 0.3, "incoming_flow": 40, "outgoing_flow": 20, "capacity": 2500 },
-    { "id": "s_mcc", "name": "MCC Lounge", "type": "stand", "x": 360, "y": 220, "current_density": 0.6, "incoming_flow": 10, "outgoing_flow": 10, "capacity": 1000 },
+    { "id": "s_fedex_kmk", "name": "North Premium Stand", "type": "stand", "x": 500, "y": 220, "current_density": 0.9, "incoming_flow": 200, "outgoing_flow": 50, "capacity": 4000 },
+    { "id": "s_c", "name": "Upper North Stand", "type": "stand", "x": 698, "y": 302, "current_density": 0.6, "incoming_flow": 150, "outgoing_flow": 100, "capacity": 3500 },
+    { "id": "s_d", "name": "East Family Stand", "type": "stand", "x": 780, "y": 500, "current_density": 0.7, "incoming_flow": 300, "outgoing_flow": 250, "capacity": 4000 },
+    { "id": "s_e", "name": "South East Stand", "type": "stand", "x": 698, "y": 698, "current_density": 0.5, "incoming_flow": 100, "outgoing_flow": 50, "capacity": 3000 },
+    { "id": "s_f", "name": "South Lower Bowl", "type": "stand", "x": 500, "y": 780, "current_density": 0.85, "incoming_flow": 400, "outgoing_flow": 100, "capacity": 5500 },
+    { "id": "s_h", "name": "West Family Stand", "type": "stand", "x": 302, "y": 698, "current_density": 0.4, "incoming_flow": 100, "outgoing_flow": 120, "capacity": 3000 },
+    { "id": "s_i", "name": "West Upper Stand", "type": "stand", "x": 220, "y": 500, "current_density": 0.2, "incoming_flow": 50, "outgoing_flow": 80, "capacity": 3000 },
+    { "id": "s_k", "name": "North West Stand", "type": "stand", "x": 302, "y": 302, "current_density": 0.3, "incoming_flow": 40, "outgoing_flow": 20, "capacity": 2500 },
+    { "id": "s_mcc", "name": "VIP Lounge", "type": "stand", "x": 360, "y": 220, "current_density": 0.6, "incoming_flow": 10, "outgoing_flow": 10, "capacity": 1000 },
 
     { "id": "food_1", "name": "North Food Court", "type": "food", "x": 420, "y": 140, "current_density": 0.6, "incoming_flow": 100, "outgoing_flow": 120, "capacity": 800 },
     { "id": "food_2", "name": "South Food Court", "type": "food", "x": 580, "y": 860, "current_density": 0.9, "incoming_flow": 300, "outgoing_flow": 200, "capacity": 800 },
     { "id": "food_3", "name": "East Pavilion Cafe", "type": "food", "x": 860, "y": 600, "current_density": 0.4, "incoming_flow": 50, "outgoing_flow": 80, "capacity": 500 }
   ],
   "stalls": [
-    { "id": "f_1", "name": "Chennai Snacks (North)", "zone": "food_1", "wait_time_mins": 5, "category": "food" },
+    { "id": "f_1", "name": "Quick Snacks North", "zone": "food_1", "wait_time_mins": 5, "category": "food" },
     { "id": "f_2", "name": "Biryani Express (South)", "zone": "food_2", "wait_time_mins": 25, "category": "food" },
-    { "id": "f_3", "name": "Chepauk Fast Food", "zone": "food_3", "wait_time_mins": 10, "category": "food" },
+    { "id": "f_3", "name": "Pavilion Fast Food", "zone": "food_3", "wait_time_mins": 10, "category": "food" },
     { "id": "f_4", "name": "Filter Coffee Stand", "zone": "s_fedex_kmk", "wait_time_mins": 15, "category": "food" }
   ],
   "routes": [

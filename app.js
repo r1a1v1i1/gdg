@@ -4,6 +4,64 @@ import { DecisionEngine } from './engine/decision.js';
 import { sanitize } from './engine/utils.js';
 // Graceful degraded network module imports removed to prevent structural bounds failure on localhost limits
 
+const STADIUM_PROFILES = {
+    narendra_modi: {
+        name: 'Narendra Modi Stadium',
+        city: 'Ahmedabad',
+        pitchLabel: 'AHMEDABAD PITCH',
+        crowdBias: { s_fedex_kmk: 0.08, s_d: 0.04, s_f: 0.06, food_2: 0.04 },
+        zoneNames: {
+            g1: 'Motera Main Gate', g4: 'East Plaza Gate', g6: 'Metro Gate', g9: 'South Gate', g11: 'Riverfront Gate', g14: 'West Gate', g16: 'Parking Gate', g17: 'North Gate',
+            s_fedex_kmk: 'Adani Pavilion', s_c: 'East Upper Stand', s_d: 'Reliance End Stand', s_e: 'South Premium Stand', s_f: 'Lower Bowl South', s_h: 'West Family Stand', s_i: 'North West Stand', s_k: 'Club House Stand', s_mcc: 'VIP President Lounge',
+            food_1: 'North Food Court', food_2: 'South Mega Food Court', food_3: 'East Pavilion Cafe'
+        }
+    },
+    eden_gardens: {
+        name: 'Eden Gardens',
+        city: 'Kolkata',
+        pitchLabel: 'EDEN PITCH',
+        crowdBias: { s_c: 0.07, s_d: 0.08, g6: 0.06, food_3: 0.04 },
+        zoneNames: {
+            g1: 'Club House Gate', g4: 'B. C. Roy Gate', g6: 'Maidan Gate', g9: 'High Court Gate', g11: 'South Exit Gate', g14: 'Prinsep Gate', g16: 'Metro Channel Gate', g17: 'North Gate',
+            s_fedex_kmk: 'Club House Block', s_c: 'B. C. Roy Stand', s_d: 'Maidan Stand', s_e: 'South Lower Stand', s_f: 'Garden Reach Stand', s_h: 'West Gallery', s_i: 'North Gallery', s_k: 'Press Box Stand', s_mcc: 'VIP Club Lounge',
+            food_1: 'Club House Snacks', food_2: 'South Food Street', food_3: 'Maidan Cafe'
+        }
+    },
+    wankhede: {
+        name: 'Wankhede Stadium',
+        city: 'Mumbai',
+        pitchLabel: 'WANKHEDE PITCH',
+        crowdBias: { s_fedex_kmk: 0.05, s_e: 0.07, s_f: 0.04, g9: 0.05 },
+        zoneNames: {
+            g1: 'Marine Drive Gate', g4: 'Churchgate Gate', g6: 'East Stand Gate', g9: 'Garware Gate', g11: 'South Gate', g14: 'West Stand Gate', g16: 'North Gate', g17: 'MCA Gate',
+            s_fedex_kmk: 'Sunil Gavaskar Stand', s_c: 'Vijay Merchant Stand', s_d: 'Sachin Tendulkar Stand', s_e: 'Garware Pavilion', s_f: 'MCA Pavilion', s_h: 'Divecha Pavilion', s_i: 'North Stand', s_k: 'West Stand', s_mcc: 'MCA VIP Lounge',
+            food_1: 'Marine Drive Food Court', food_2: 'South Pavilion Food Court', food_3: 'East Stand Cafe'
+        }
+    },
+    chinnaswamy: {
+        name: 'M. Chinnaswamy Stadium',
+        city: 'Bengaluru',
+        pitchLabel: 'BENGALURU PITCH',
+        crowdBias: { s_k: 0.07, s_i: 0.04, food_1: 0.05, g17: 0.04 },
+        zoneNames: {
+            g1: 'Cubbon Road Gate', g4: 'MG Road Gate', g6: 'Metro Gate', g9: 'Queens Road Gate', g11: 'South Pavilion Gate', g14: 'West Gate', g16: 'North Gate', g17: 'Club House Gate',
+            s_fedex_kmk: 'Pavilion Terrace', s_c: 'East Upper Stand', s_d: 'B Stand', s_e: 'South Pavilion', s_f: 'Lower Pavilion', s_h: 'West Stand', s_i: 'North Stand', s_k: 'Club House Stand', s_mcc: 'KSCA VIP Lounge',
+            food_1: 'Cubbon Food Court', food_2: 'South Pavilion Snacks', food_3: 'Metro Side Cafe'
+        }
+    },
+    chepauk: {
+        name: 'M. A. Chidambaram Stadium',
+        city: 'Chennai',
+        pitchLabel: 'CHEPAUK PITCH',
+        crowdBias: { s_fedex_kmk: 0.08, s_f: 0.06, food_2: 0.05, g6: 0.04 },
+        zoneNames: {
+            g1: 'Wallajah Road Gate', g4: 'Victoria Hostel Gate', g6: 'Bells Road Gate', g9: 'South Stand Gate', g11: 'Pavilion Exit', g14: 'Canal Gate', g16: 'Triplicane Gate', g17: 'North Gate',
+            s_fedex_kmk: 'KMK Stand', s_c: 'C Stand', s_d: 'D Stand', s_e: 'E Stand', s_f: 'F/G/J Stand', s_h: 'H Stand', s_i: 'I Stand', s_k: 'K Stand', s_mcc: 'MCC Lounge',
+            food_1: 'North Food Court', food_2: 'South Food Court', food_3: 'East Pavilion Cafe'
+        }
+    }
+};
+
 class CrowdOSApp {
     constructor() {
         this.perception = null;
@@ -12,6 +70,11 @@ class CrowdOSApp {
         this.mapState = { svgHtml: '', baseWithNodes: '' };
         this.simulationTimer = null;
         this.cachedAvgDensity = 0;
+        this.baseDataset = null;
+        this.currentStadiumKey = 'narendra_modi';
+        this.venueName = STADIUM_PROFILES[this.currentStadiumKey].name;
+        this.pitchLabel = STADIUM_PROFILES[this.currentStadiumKey].pitchLabel;
+        this.isFanMode = false;
     }
 
     async pushCrowdData(zones) {
@@ -23,17 +86,78 @@ class CrowdOSApp {
         }
     }
 
+    applyStadiumProfile(data, profileKey) {
+        const profile = STADIUM_PROFILES[profileKey] || STADIUM_PROFILES.narendra_modi;
+        const cloned = JSON.parse(JSON.stringify(data));
+
+        this.currentStadiumKey = profileKey;
+        this.venueName = profile.name;
+        this.pitchLabel = profile.pitchLabel;
+
+        cloned.venue = {
+            id: profileKey,
+            name: profile.name,
+            city: profile.city
+        };
+
+        cloned.zones = cloned.zones.map(zone => {
+            const bias = profile.crowdBias?.[zone.id] || 0;
+            return {
+                ...zone,
+                name: profile.zoneNames[zone.id] || zone.name,
+                current_density: Math.min(0.98, Math.max(0.08, zone.current_density + bias))
+            };
+        });
+
+        cloned.stalls = cloned.stalls.map(stall => {
+            const zoneName = profile.zoneNames[stall.zone] || stall.name;
+            const label = stall.name.includes('Coffee') ? 'Coffee Counter' : stall.name.includes('Biryani') ? 'Biryani Express' : 'Quick Bites';
+            return {
+                ...stall,
+                name: `${label} - ${zoneName}`
+            };
+        });
+
+        return cloned;
+    }
+
+    switchStadium(profileKey) {
+        if (!this.baseDataset || !this.perception) return;
+        const nextData = this.applyStadiumProfile(this.baseDataset, profileKey);
+
+        this.perception.updateState(nextData);
+        this.perception.routes = nextData.routes || [];
+        this.cachedAvgDensity = this.decision.getGlobalAvgDensity();
+
+        this.populateLocationSelector();
+        this.renderCustomSvgMap();
+        this.updateRealTimePanels();
+        this.logToConsole(`Venue switched to ${this.venueName}. Digital twin and crowd model refreshed.`, "success");
+        this.updateVenueLabels();
+    }
+
+    updateVenueLabels() {
+        const fanTitle = document.querySelector('.fan-hero h2');
+        if (fanTitle) fanTitle.textContent = `Welcome to ${this.venueName}`;
+
+        const mapTitle = document.querySelector('.map-panel .panel-header h2');
+        if (mapTitle) mapTitle.textContent = `${this.venueName} Digital Twin`;
+    }
+
     async init() {
         try {
             const response = await fetch('./data/mockData.json');
             if (!response.ok) throw new Error("Dataset synchronization disabled.");
             const data = await response.json();
+            this.baseDataset = data;
+            const activeData = this.applyStadiumProfile(data, this.currentStadiumKey);
 
-            this.perception = new PerceptionEngine(data);
+            this.perception = new PerceptionEngine(activeData);
             this.decision = new DecisionEngine(this.perception, this.prediction);
 
             this.populateLocationSelector();
             this.bindEvents();
+            this.updateVenueLabels();
             this.renderCustomSvgMap();
             this.updateRealTimePanels(); // Initialize dynamic UI states
             this.subscribeToCrowd();
@@ -42,7 +166,7 @@ class CrowdOSApp {
             // Part 4: REAL-TIME COORDINATION SYSTEM & SIMULATION LOOP
             this.simulationTimer = setInterval(() => this.simulateCrowdDynamics(), 3000);
 
-            this.logToConsole("System Booting: Chepauk Stadium Coordination tracking active.", "success");
+            this.logToConsole(`System Booting: ${this.venueName} coordination tracking active.`, "success");
 
             setTimeout(() => {
                 this.addLiveAlert(
@@ -205,6 +329,7 @@ class CrowdOSApp {
         this.updateWaitTimes();
         this.updateSmartConcessions();
         this.updateSystemStatus();
+        this.updateFanStatus();
     }
     
 
@@ -378,26 +503,31 @@ class CrowdOSApp {
         typeBadge = '🔄 REDIRECT';
     }
 
+    let alertHtml = '';
+    const safeMessage = sanitize(message);
+    const safeTime = sanitize(timeString);
+    const safeTypeBadge = sanitize(typeBadge);
+
     if (type === 'system_alert') {
         typeClass = 'alert-high';
         typeBadge = '⚠ SYSTEM ALERT';
         alertHtml = `
-            <div class="alert-msg ${typeClass}" data-msg="${message}" style="border: 2px solid #FF1744; box-shadow: 0 0 15px rgba(255,23,68,0.6); padding: 12px; transform: scale(1.02); background: rgba(255,23,68,0.1);">
+            <div class="alert-msg ${typeClass}" data-msg="${safeMessage}" style="border: 2px solid #FF1744; box-shadow: 0 0 15px rgba(255,23,68,0.6); padding: 12px; transform: scale(1.02); background: rgba(255,23,68,0.1);">
                 <div class="alert-header" style="font-size: 14px; font-weight: bold; color: #FF1744;">
-                    <span>${typeBadge}</span>
-                    <span>${timeString}</span>
+                    <span>⚠ SYSTEM ALERT</span>
+                    <span>${safeTime}</span>
                 </div>
-                <div style="font-weight: bold; font-size: 14px;">${message}</div>
+                <div style="font-weight: bold; font-size: 14px;">${safeMessage}</div>
             </div>
         `;
     } else {
         alertHtml = `
-            <div class="alert-msg ${typeClass}" data-msg="${message}">
+            <div class="alert-msg ${typeClass}" data-msg="${safeMessage}">
                 <div class="alert-header">
-                    <span>${typeBadge}</span>
-                    <span>${timeString}</span>
+                    <span>${safeTypeBadge}</span>
+                    <span>${safeTime}</span>
                 </div>
-                <div>${message}</div>
+                <div>${safeMessage}</div>
             </div>
         `;
     }
@@ -415,7 +545,7 @@ class CrowdOSApp {
 
         let html = `
              <circle cx="500" cy="500" r="140" fill="#1C3829" stroke="rgba(255,255,255,0.2)" stroke-width="2"></circle>
-             <text x="500" y="500" fill="rgba(255,255,255,0.4)" font-size="20" font-weight="700" text-anchor="middle" alignment-baseline="middle" letter-spacing="4">CHEPAUK PITCH</text>
+             <text x="500" y="500" fill="rgba(255,255,255,0.4)" font-size="20" font-weight="700" text-anchor="middle" alignment-baseline="middle" letter-spacing="4">${sanitize(this.pitchLabel)}</text>
              
              <circle cx="500" cy="500" r="280" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="40"></circle>
              <circle cx="500" cy="500" r="420" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="10"></circle>
@@ -475,44 +605,98 @@ class CrowdOSApp {
     }
 
     populateLocationSelector() {
-        const select = document.getElementById('user-location');
-        this.perception.zones.forEach(z => {
-            const opt = document.createElement('option');
-            opt.value = z.id;
-            opt.textContent = z.name;
-            select.appendChild(opt);
+        const selects = [
+            document.getElementById('user-location'),
+            document.getElementById('fan-location')
+        ].filter(Boolean);
+
+        selects.forEach(select => {
+            const selectedValue = select.value;
+            select.textContent = '';
+            const placeholder = document.createElement('option');
+            placeholder.value = '';
+            placeholder.disabled = true;
+            placeholder.textContent = 'Select starting location...';
+            select.appendChild(placeholder);
+
+            this.perception.zones.forEach(z => {
+                const opt = document.createElement('option');
+                opt.value = z.id;
+                opt.textContent = z.name;
+                select.appendChild(opt);
+            });
+
+            select.value = this.perception.getZone(selectedValue) ? selectedValue : '';
         });
     }
 
     bindEvents() {
         document.getElementById('btn-food').addEventListener('click', () => this.handleAction('food'));
         document.getElementById('btn-exit').addEventListener('click', () => this.handleAction('exit'));
+        document.getElementById('btn-fan-food')?.addEventListener('click', () => this.handleAction('food', 'Find food near me', 'fan-location'));
+        document.getElementById('btn-fan-exit')?.addEventListener('click', () => this.handleAction('exit', 'Find the safest exit', 'fan-location'));
+
+        const modeToggle = document.getElementById('mode-toggle');
+        if (modeToggle) {
+            modeToggle.addEventListener('click', () => this.toggleFanMode());
+        }
+
+        const stadiumSelect = document.getElementById('stadium-select');
+        if (stadiumSelect) {
+            stadiumSelect.value = this.currentStadiumKey;
+            stadiumSelect.addEventListener('change', () => this.switchStadium(stadiumSelect.value));
+        }
+
+        const fanSelect = document.getElementById('fan-location');
+        const opsSelect = document.getElementById('user-location');
+        fanSelect?.addEventListener('change', () => {
+            if (opsSelect) opsSelect.value = fanSelect.value;
+        });
+        opsSelect?.addEventListener('change', () => {
+            if (fanSelect) fanSelect.value = opsSelect.value;
+        });
 
         const textSubmit = document.getElementById('btn-submit-text');
         if (textSubmit) {
-            textSubmit.addEventListener('click', () => {
-                const text = document.getElementById('text-intent').value.toLowerCase();
+            textSubmit.addEventListener('click', () => this.handleTextIntent('text-intent', 'user-location'));
+        }
 
-                // PART 2: IMPROVED NLP ASSISTANT INPUT
-                if (text.includes("food") || text.includes("eat") || text.includes("hungry")) {
-                    this.handleAction('food');
-                } else if (text.includes("exit") || text.includes("escape") || text.includes("out") || text.includes("leave")) {
-                    this.handleAction('exit');
-                } else if (text.includes("crowd") || text.includes("density") || text.includes("busy") || text.includes("analyze")) {
-                    this.handleAction('crowd');
-                } else if (text.includes("wait") || text.includes("time") || text.includes("slow")) {
-                    this.handleAction('wait');
-                } else if (text.includes("route") || text.includes("move") || text.includes("walk") || text.includes("path")) {
-                    this.handleAction('route');
-                } else {
-                    this.logToConsole("AI Unclear: Please ask to 'find food', 'find exit', 'analyze crowd', 'optimize wait', or 'best route'.");
-                }
-            });
+        document.getElementById('btn-fan-submit')?.addEventListener('click', () => this.handleTextIntent('fan-intent', 'fan-location'));
+        document.getElementById('text-intent')?.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') this.handleTextIntent('text-intent', 'user-location');
+        });
+        document.getElementById('fan-intent')?.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') this.handleTextIntent('fan-intent', 'fan-location');
+        });
+    }
+
+    handleTextIntent(inputId, locationSelectId) {
+        const input = document.getElementById(inputId);
+        const rawText = input?.value?.trim() || '';
+        const text = rawText.toLowerCase();
+
+        if (!text) {
+            this.logToConsole("Ask CrowdOS about food, exits, crowding, wait time, or movement guidance.", "info");
+            return;
+        }
+
+        if (text.includes("food") || text.includes("eat") || text.includes("hungry")) {
+            this.handleAction('food', rawText, locationSelectId);
+        } else if (text.includes("exit") || text.includes("escape") || text.includes("out") || text.includes("leave")) {
+            this.handleAction('exit', rawText, locationSelectId);
+        } else if (text.includes("crowd") || text.includes("density") || text.includes("busy") || text.includes("analyze")) {
+            this.handleAction('crowd', rawText, locationSelectId);
+        } else if (text.includes("wait") || text.includes("time") || text.includes("slow")) {
+            this.handleAction('wait', rawText, locationSelectId);
+        } else if (text.includes("route") || text.includes("move") || text.includes("walk") || text.includes("path")) {
+            this.handleAction('route', rawText, locationSelectId);
+        } else {
+            this.askGemini(rawText, { actionType: 'open_question' });
         }
     }
 
-    handleAction(actionType) {
-        const locationId = document.getElementById('user-location').value;
+    async handleAction(actionType, userMessage = '', locationSelectId = 'user-location') {
+        const locationId = document.getElementById(locationSelectId)?.value || document.getElementById('user-location')?.value;
         if (!locationId && actionType !== 'crowd') return this.logToConsole("Spatial context ID missing. Please select starting zone.", "error");
 
         let structuredResult;
@@ -531,6 +715,11 @@ class CrowdOSApp {
 
             // Removes raw JSON output replacing it with human readable intelligence format
             this.renderFriendlyLog(structuredResult.OUTPUT, "System Assessment Phase");
+            this.askGemini(userMessage || actionType, {
+                actionType,
+                locationId,
+                structuredResult
+            });
 
             // Animation and Map overlay handling
             if (structuredResult._payload && structuredResult._payload.destination) {
@@ -590,6 +779,138 @@ class CrowdOSApp {
             addition += '<circle cx="' + z.x + '" cy="' + z.y + '" fill="none" stroke="#FF1744" stroke-width="4" class="overlay-layer pulse-target" r="32"></circle>';
         });
         svg.innerHTML += addition;
+    }
+
+    toggleFanMode() {
+        this.isFanMode = !this.isFanMode;
+        document.body.classList.toggle('fan-mode', this.isFanMode);
+        const toggle = document.getElementById('mode-toggle');
+        if (toggle) toggle.textContent = this.isFanMode ? 'Ops Mode' : 'Fan Mode';
+        this.updateFanStatus();
+    }
+
+    updateFanStatus() {
+        const el = document.getElementById('fan-status-card');
+        if (!el || !this.perception) return;
+
+        const crowded = [...this.perception.zones].sort((a, b) => b.current_density - a.current_density)[0];
+        const safestExit = this.perception.getAllExits().sort((a, b) => a.current_density - b.current_density)[0];
+        const avg = this.decision ? this.decision.getGlobalAvgDensity() : this.cachedAvgDensity;
+        const level = avg > 0.7 ? 'high' : avg > 0.4 ? 'moderate' : 'light';
+
+        el.textContent = `${this.venueName} is currently at ${level} crowd load. ${crowded.name} is busiest, so avoid that area if possible. For exit movement, ${safestExit.name} is the clearest option right now.`;
+    }
+
+    getCrowdContext(actionContext = {}) {
+        const topZones = [...this.perception.zones]
+            .sort((a, b) => b.current_density - a.current_density)
+            .slice(0, 6)
+            .map(z => ({
+                name: z.name,
+                type: z.type,
+                density_percent: Math.round(z.current_density * 100),
+                predicted_percent: Math.round((z.future_density ?? z.current_density) * 100)
+            }));
+
+        const quietZones = [...this.perception.zones]
+            .sort((a, b) => a.current_density - b.current_density)
+            .slice(0, 4)
+            .map(z => `${z.name} (${Math.round(z.current_density * 100)}%)`);
+
+        const currentZone = actionContext.locationId ? this.perception.getZone(actionContext.locationId) : null;
+
+        return {
+            venue: this.venueName,
+            current_zone: currentZone ? currentZone.name : 'not selected',
+            global_density_percent: Math.round(this.decision.getGlobalAvgDensity() * 100),
+            busiest_zones: topZones,
+            quiet_zones: quietZones,
+            route_engine_output: actionContext.structuredResult?.OUTPUT || null
+        };
+    }
+
+    async askGemini(userMessage, actionContext = {}) {
+        const context = this.getCrowdContext(actionContext);
+        const prompt = [
+            'You are CrowdOS, a crowd intelligence assistant for a large sporting venue.',
+            'Based on current zone density data, give the attendee a short, clear recommendation in 2-3 sentences max.',
+            'Use direct language. Mention the safest area, route, or wait advice when relevant.',
+            '',
+            `User request: ${userMessage || actionContext.actionType}`,
+            `Crowd context: ${JSON.stringify(context)}`
+        ].join('\n');
+
+        this.renderGeminiMessage('Gemini is checking live crowd context...', true);
+
+        try {
+            const payload = {
+                contents: [{ role: 'user', parts: [{ text: prompt }] }],
+                generationConfig: { temperature: 0.35, maxOutputTokens: 120 }
+            };
+
+            let response = await fetch('/api/gemini', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const browserKey = localStorage.getItem('GEMINI_API_KEY');
+                if (!browserKey) throw new Error('Gemini key missing');
+
+                response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${browserKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            }
+
+            if (!response.ok) throw new Error('Gemini request failed');
+            const data = await response.json();
+            const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).join(' ').trim();
+            if (!text) throw new Error('Gemini returned an empty response');
+            this.renderGeminiMessage(text);
+        } catch (error) {
+            this.renderGeminiMessage(this.buildOfflineAssistantReply(userMessage, context));
+        }
+    }
+
+    buildOfflineAssistantReply(userMessage, context) {
+        const topCrowded = context.busiest_zones[0];
+        const quiet = context.quiet_zones[0] || 'a lower-density concourse';
+        const output = context.route_engine_output;
+
+        if (output?.recommended_action) {
+            const action = output.recommended_action.replace('🚀 FINAL DECISION:', '').replace(/\s+/g, ' ').trim();
+            return `${action}. Current risk is ${Math.round(output.metrics.risk_score * 100)}%, so follow the highlighted route and avoid ${topCrowded.name}.`;
+        }
+
+        if ((userMessage || '').toLowerCase().includes('busy')) {
+            return `${topCrowded.name} is the busiest area at ${topCrowded.density_percent}%. Move toward ${quiet} or wait briefly before crossing that corridor.`;
+        }
+
+        return `Crowd load is ${context.global_density_percent}% overall. Avoid ${topCrowded.name} and prefer ${quiet} for safer movement right now.`;
+    }
+
+    renderGeminiMessage(message, isLoading = false) {
+        const consoleEl = document.getElementById('assistant-console');
+        if (!consoleEl) return;
+
+        const existingLoading = consoleEl.querySelector('[data-gemini-loading="true"]');
+        if (existingLoading) existingLoading.remove();
+
+        const block = document.createElement('div');
+        block.className = 'structured-log-block gemini-log';
+        if (isLoading) block.dataset.geminiLoading = 'true';
+        block.innerHTML = `
+            <div class="log-header">Gemini Assistant</div>
+            <div>${sanitize(message)}</div>
+        `;
+        consoleEl.prepend(block);
+
+        if (consoleEl.children.length > 6) {
+            consoleEl.removeChild(consoleEl.lastChild);
+        }
     }
 
     renderFriendlyLog(outputObj, titleText = "AI Decision") {

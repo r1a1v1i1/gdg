@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CrowdOS - Chepauk Stadium Edition</title>
+    <title>CrowdOS - Smart Stadium Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <meta name="description" content="AI Graph Routing System mapping exact stadium densities to safely process intent actions.">
@@ -15,12 +15,53 @@
                 <span class="pulse-dot"></span>
                 <h1>CrowdOS</h1>
             </div>
-            <div class="server-status">
-                <span class="status-indicator"></span> Deep AI Processing Matrix
+            <div class="topbar-actions">
+                <select id="stadium-select" class="stadium-select" aria-label="Select stadium">
+                    <option value="narendra_modi">Narendra Modi Stadium</option>
+                    <option value="eden_gardens">Eden Gardens</option>
+                    <option value="wankhede">Wankhede Stadium</option>
+                    <option value="chinnaswamy">M. Chinnaswamy Stadium</option>
+                    <option value="chepauk">M. A. Chidambaram Stadium</option>
+                </select>
+                <button id="mode-toggle" class="mode-toggle" type="button">Fan Mode</button>
+                <div class="server-status">
+                    <span class="status-indicator"></span> Gemini Crowd Assistant
+                </div>
             </div>
         </header>
         
         <main class="grid-layout">
+            <section id="fan-view" class="fan-view">
+                <div class="fan-hero">
+                    <div>
+                        <p class="fan-kicker">CrowdOS Fan View</p>
+                        <h2>Welcome to Smart Cricket Arena</h2>
+                    </div>
+                    <span class="badge ai-badge">Live Guidance</span>
+                </div>
+
+                <div id="fan-status-card" class="fan-status-card">
+                    Live crowd summary loading...
+                </div>
+
+                <div class="fan-controls">
+                    <label for="fan-location">Your current area</label>
+                    <select id="fan-location">
+                        <option value="" disabled selected>Select starting location...</option>
+                    </select>
+
+                    <div class="text-input-wrapper fan-input-row">
+                        <input type="text" id="fan-intent" class="intent-input" placeholder="Ask: where should I go now?" />
+                        <button id="btn-fan-submit" class="btn-micro">SEND</button>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button id="btn-fan-food" class="btn primary" type="button">Find Food Near Me</button>
+                        <button id="btn-fan-exit" class="btn danger" type="button">Find Exit</button>
+                    </div>
+                </div>
+            </section>
+
             <!-- PART 1 & 3: NEW INSIGHTS PANEL -->
             <section class="panel insights-panel">
                 <div class="panel-header">
@@ -50,7 +91,7 @@
 
             <section class="panel map-panel">
                 <div class="panel-header">
-                    <h2>Chepauk Stadium Digital Twin</h2>
+                    <h2>Smart Cricket Arena Digital Twin</h2>
                     <span class="badge ai-badge">SVG Spatial Modeling</span>
                 </div>
                 <div id="svg-container" class="map-view">
