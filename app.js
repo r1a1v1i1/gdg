@@ -647,6 +647,10 @@ class CrowdOSApp {
             stadiumSelect.addEventListener('change', () => this.switchStadium(stadiumSelect.value));
         }
 
+        document.getElementById('btn-gemini-assistant')?.addEventListener('click', () => {
+            this.handleAction('crowd', `Give me a live crowd safety summary for ${this.venueName}`);
+        });
+
         const fanSelect = document.getElementById('fan-location');
         const opsSelect = document.getElementById('user-location');
         fanSelect?.addEventListener('change', () => {
